@@ -3,6 +3,12 @@ crypto group project sources code and guide how to run it
 
 # Symmetric Cipher Project – NWC3373
 
+## Team
+- [Akmal Anas] – [Lead Developer & Stream Cipher Lead]
+- [Danish Hakim] – [Cryptographic Architect & Block Cipher Lead]
+- [Muhammad Hafiz] – [Performance Analyst & Data Engineer]
+- [Ahmad Uzair] – [Security Analyst & Technical Writer Lead]
+
 Implementation and evaluation of two symmetric ciphers for the Fundamental of Cryptography group project.
 
 | File | Purpose |
@@ -24,9 +30,3 @@ python -m unittest discover -s tests    # unit tests
 python security_demos.py                # security demonstrations
 python performance_test.py              # benchmark (creates results/)
 ```
-
-## Team
-- [Akmal Anas] – [Lead Developer & Stream Cipher Lead]
-- [Danish Hakim] – [Cryptographic Architect & Block Cipher Lead]
-- [Muhammad Hafiz] – [Performance Analyst & Data Engineer]
-- [Ahmad Uzair] – [Security Analyst & Technical Writer Lead]
