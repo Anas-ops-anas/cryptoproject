@@ -1,6 +1,6 @@
 """
 A2. Block Cipher - Custom 8-round Feistel network
-Course : Fundamental of Cryptography (NWC3373/NWC3193)
+Course : Fundamental of Cryptography (NWC3373)
 
 Parameters
   Block size : 64 bits (two 32-bit halves L, R)
@@ -13,20 +13,17 @@ Round structure (encryption), for i = 1..8:
       R_i = L_{i-1} XOR F(R_{i-1}, K_i)
 Decryption is the same network with the subkeys used in reverse order (K_8 ... K_1),
 so F does not have to be invertible.
-
-Educational only: this is a custom design and has NOT been cryptanalysed.
 """
 
 import os
 import struct
 
 ROUNDS = 8
-BLOCK_SIZE = 8            # bytes
-KEY_SIZE = 16             # bytes
+BLOCK_SIZE = 8            
+KEY_SIZE = 16             
 MASK32 = 0xFFFFFFFF
 
 
-# ---------------------------------------------------------------- helpers
 def rotl32(x: int, n: int) -> int:
     n %= 32
     return ((x << n) | (x >> (32 - n))) & MASK32
@@ -67,7 +64,6 @@ def _build_sbox() -> list:
 SBOX = _build_sbox()
 
 
-# ---------------------------------------------------------------- key schedule
 def generate_key(length: int = KEY_SIZE) -> bytes:
     return os.urandom(length)
 
@@ -81,7 +77,7 @@ def key_schedule(key: bytes) -> list:
     w = list(struct.unpack(">4I", key))
     subkeys = []
     for r in range(ROUNDS):
-        rc = (0x9E3779B9 * (r + 1)) & MASK32           # round constant
+        rc = (0x9E3779B9 * (r + 1)) & MASK32          
         w[r % 4] = rotl32((w[r % 4] + w[(r + 1) % 4]) & MASK32, 7) ^ rc
         t = w[(r + 3) % 4]
         t = (SBOX[t & 0xFF] | (SBOX[(t >> 8) & 0xFF] << 8) |
@@ -90,7 +86,6 @@ def key_schedule(key: bytes) -> list:
     return subkeys
 
 
-# ---------------------------------------------------------------- round function
 def round_function(r: int, k: int) -> int:
     """F(R, K): key mixing -> byte-wise S-box (confusion) -> rotate/XOR mixing (diffusion)."""
     x = r ^ k
@@ -99,12 +94,11 @@ def round_function(r: int, k: int) -> int:
     return x ^ rotl32(x, 9) ^ rotl32(x, 19)
 
 
-# ---------------------------------------------------------------- single-block operations
 def _process_block(block: bytes, subkeys: list) -> bytes:
     L, R = struct.unpack(">2I", block)
     for k in subkeys:
         L, R = R, L ^ round_function(R, k)
-    return struct.pack(">2I", R, L)          # final swap so decryption = same network
+    return struct.pack(">2I", R, L)          
 
 
 def encrypt_block(block: bytes, subkeys: list) -> bytes:
@@ -115,7 +109,6 @@ def decrypt_block(block: bytes, subkeys: list) -> bytes:
     return _process_block(block, subkeys[::-1])
 
 
-# ---------------------------------------------------------------- padding
 def pad(data: bytes) -> bytes:
     n = BLOCK_SIZE - (len(data) % BLOCK_SIZE)
     return data + bytes([n]) * n
@@ -130,7 +123,6 @@ def unpad(data: bytes) -> bytes:
     return data[:-n]
 
 
-# ---------------------------------------------------------------- CBC mode (used by the project)
 def encrypt(plaintext: bytes, key: bytes) -> bytes:
     """Output: IV (8 bytes) || ciphertext."""
     sk = key_schedule(key)
@@ -161,14 +153,12 @@ def decrypt(blob: bytes, key: bytes) -> bytes:
     return unpad(bytes(out))
 
 
-# ---------------------------------------------------------------- ECB (demonstration ONLY)
 def encrypt_ecb(plaintext: bytes, key: bytes) -> bytes:
     sk = key_schedule(key)
     data = pad(plaintext)
     return b"".join(encrypt_block(data[i:i + 8], sk) for i in range(0, len(data), 8))
 
 
-# ---------------------------------------------------------------- DEMO / SELF-TEST
 if __name__ == "__main__":
     key = generate_key()
     print("Key (hex)       :", key.hex())
@@ -187,11 +177,11 @@ if __name__ == "__main__":
     assert decrypt(blob, key) == msg
     print("Decrypted       :", decrypt(blob, key))
 
-    assert encrypt(msg, key) != encrypt(msg, key)           # random IV
+    assert encrypt(msg, key) != encrypt(msg, key)           
     try:
-        assert decrypt(blob, generate_key()) != msg          # wrong key
+        assert decrypt(blob, generate_key()) != msg         
     except ValueError:
-        pass                                                 # bad padding is also a failure
+        pass                                                 
 
     for size in (0, 1, 7, 8, 9, 1024, 100 * 1024, 1024 * 1024):
         data = os.urandom(size)
