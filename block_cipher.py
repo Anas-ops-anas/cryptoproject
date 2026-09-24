@@ -164,7 +164,6 @@ if __name__ == "__main__":
     print("Key (hex)       :", key.hex())
     print("Subkeys         :", [hex(k) for k in key_schedule(key)])
 
-    # single block round trip
     sk = key_schedule(key)
     blk = b"ABCDEFGH"
     enc = encrypt_block(blk, sk)
