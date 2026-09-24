@@ -26,5 +26,7 @@ python performance_test.py              # benchmark (creates results/)
 ```
 
 ## Team
-- [Member 1 name] – [tasks]
-- [Member 2 name] – [tasks]
+- [Akmal Anas] – [Lead Developer & Stream Cipher Lead]
+- [Danish Hakim] – [Cryptographic Architect & Block Cipher Lead]
+- [Muhammad Hafiz] – [Performance Analyst & Data Engineer]
+- [Ahmad Uzair] – [Security Analyst & Technical Writer Lead]
