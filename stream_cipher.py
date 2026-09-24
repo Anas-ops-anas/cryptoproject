@@ -1,25 +1,22 @@
 """
 A1. Stream Cipher - Simplified RC4-like algorithm
-Course : Fundamental of Cryptography (NWC3373/NWC3193)
+Course : Fundamental of Cryptography (NWC3373)
 
 Components
   1. Key generation      -> generate_key()       (random key or password-derived key)
   2. Keystream generation-> ksa() + prga()       (RC4-style KSA and PRGA, with "drop-N")
   3. XOR encryption      -> xor_bytes()          (plaintext XOR keystream)
   4. Decryption          -> decrypt()            (same XOR with the same keystream)
-
-Educational only: RC4 is considered broken and must not be used in production.
 """
 
 import os
 import hashlib
 
-DROP_N = 768          # discard first N keystream bytes (mitigates RC4 initial-byte bias)
-NONCE_LEN = 8         # per-message random nonce so the same key never reuses a keystream
-KEY_LEN = 16          # 128-bit key
+DROP_N = 768         
+NONCE_LEN = 8         
+KEY_LEN = 16        
 
 
-# ---------------------------------------------------------------- 1. KEY GENERATION
 def generate_key(length: int = KEY_LEN) -> bytes:
     """Generate a cryptographically secure random key."""
     return os.urandom(length)
@@ -30,7 +27,6 @@ def key_from_password(password: str, salt: bytes, length: int = KEY_LEN) -> byte
     return hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100_000, dklen=length)
 
 
-# ---------------------------------------------------------------- 2. KEYSTREAM GENERATION
 def ksa(key: bytes) -> list:
     """Key-Scheduling Algorithm: permute S = [0..255] using the key."""
     if not 1 <= len(key) <= 256:
@@ -64,7 +60,6 @@ def keystream(key: bytes, nonce: bytes, length: int) -> bytes:
     return bytes(next(gen) for _ in range(length))
 
 
-# ---------------------------------------------------------------- 3. XOR ENCRYPTION
 def xor_bytes(data: bytes, ks: bytes) -> bytes:
     return bytes(a ^ b for a, b in zip(data, ks))
 
@@ -76,14 +71,12 @@ def encrypt(plaintext: bytes, key: bytes) -> bytes:
     return nonce + xor_bytes(plaintext, ks)
 
 
-# ---------------------------------------------------------------- 4. DECRYPTION
 def decrypt(blob: bytes, key: bytes) -> bytes:
     nonce, ct = blob[:NONCE_LEN], blob[NONCE_LEN:]
     ks = keystream(key, nonce, len(ct))
     return xor_bytes(ct, ks)
 
 
-# ---------------------------------------------------------------- DEMO / SELF-TEST
 if __name__ == "__main__":
     key = generate_key()
     print("Key (hex)      :", key.hex())
@@ -96,19 +89,15 @@ if __name__ == "__main__":
     print("Decrypted      :", recovered)
     assert recovered == msg, "Decryption failed!"
 
-    # Same plaintext twice -> different ciphertext (fresh nonce)
     assert encrypt(msg, key) != encrypt(msg, key)
 
-    # Wrong key must not recover plaintext
     assert decrypt(blob, generate_key()) != msg
 
-    # Known-answer check: RC4 test vector (Key="Key", Plain="Plaintext") without drop/nonce
     S = ksa(b"Key")
     g = prga(S, drop=0)
     ct = xor_bytes(b"Plaintext", bytes(next(g) for _ in range(9)))
     assert ct.hex().upper() == "BBF316E8D940AF0AD3", ct.hex()
 
-    # File-size round trips (matches Part B test sizes)
     for size in (1024, 100 * 1024, 1024 * 1024):
         data = os.urandom(size)
         assert decrypt(encrypt(data, key), key) == data
