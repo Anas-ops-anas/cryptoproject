@@ -6,8 +6,8 @@ crypto group project sources code and guide how to run it
 ## Team
 - [Akmal Anas] – [Lead Developer & Stream Cipher Lead]
 - [Ahmad Uzair] – [Security Analyst & Technical Writer Lead]
-- [Danish Hakim] – [Cryptographic Architect & Block Cipher Lead]
-- [Muhammad Hafiz] – [Performance Analyst & Data Engineer]
+- [Muhammad Hafiz] – [Cryptographic Architect & Block Cipher Lead]
+- [Danish Hakim] – [Performance Analyst & Data Engineer]
 
 
 
