@@ -1,0 +1,11 @@
+Python 3.14.2 on Linux | 10 runs per test
+
+   1 KB | stream enc    1.3160  dec    1.8871 | feistel enc    2.6577  dec    2.6531  (ms)
+ 100 KB | stream enc   36.7860  dec   34.0156 | feistel enc  117.2828  dec  117.5223  (ms)
+   1 MB | stream enc  361.0822  dec  363.9499 | feistel enc 1202.2808  dec 1220.5670  (ms)
+
+Slowdown of block cipher vs stream cipher
+   1 KB | enc 2.02x | dec 1.41x
+ 100 KB | enc 3.19x | dec 3.45x
+   1 MB | enc 3.33x | dec 3.35x
+matplotlib not installed - skipping charts (pip install matplotlib)
